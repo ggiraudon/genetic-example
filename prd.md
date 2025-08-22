@@ -108,6 +108,3 @@ Testing and debugging
 Documentation
 
 
-Explain your strategy in building this application as well as the list of tasks required to complete it.
-Ask questions if necessary.
-

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Genetic Algorithm Car Maze</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #1a1a1a;
+        color: white;
+      }
+      
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      
+      #game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      
+      #canvas {
+        border: 2px solid #333;
+        background-color: #000;
+      }
+      
+      #stats-panel {
+        background-color: #333;
+        padding: 15px;
+        border-radius: 8px;
+        min-width: 300px;
+        text-align: center;
+      }
+      
+      .stat-item {
+        margin: 5px 0;
+        font-size: 16px;
+      }
+      
+      .stat-label {
+        font-weight: bold;
+        color: #4CAF50;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container">
+      <h1>Genetic Algorithm Car Maze</h1>
+      <canvas id="canvas"></canvas>
+      <div id="stats-panel">
+        <div class="stat-item">
+          <span class="stat-label">Generation:</span>
+          <span id="generation">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Cars Alive:</span>
+          <span id="cars-alive">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Cars:</span>
+          <span id="total-cars">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Best Fitness:</span>
+          <span id="best-fitness">0</span>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
