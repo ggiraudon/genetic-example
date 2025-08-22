@@ -1,5 +1,11 @@
+import { Actor, Color, Vector, Shape, Collider, CollisionType, CollisionGroupManager } from 'excalibur';
+
 import { Car } from './car';
 import { Maze } from './maze';
+
+export const CarGroup = CollisionGroupManager.create('cars');
+export const WallGroup = CollisionGroupManager.create('walls');
+export const SensorGroup = CollisionGroupManager.create('sensors');
 
 export class GeneticAlgorithm {
   population: Car[] = [];
@@ -22,7 +28,9 @@ export class GeneticAlgorithm {
     // Initialize population with random genomes
     for (let i = 0; i < this.carsPerGeneration; i++) {
       const genome = Array.from({ length: 15 }, () => Math.random() * 10);
-      this.population.push(new Car(50, 50, 0, 2, genome));
+      //this.population.push(new Car(50, 50, 0, 2, genome));
+      this.population.push(new Car(Math.random()*800, Math.random()*600, Math.random()*180, 2, genome));
+
     }
   }
 
@@ -30,6 +38,9 @@ export class GeneticAlgorithm {
     // Add cars to engine
     for (const car of this.population) {
       engine.add(car);
+      for (const sensor of car.sensors) {
+        engine.add(sensor);
+      }
     }
   }
 }
