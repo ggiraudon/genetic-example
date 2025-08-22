@@ -1,4 +1,4 @@
-import { Actor } from 'excalibur';
+import { Actor, Vector } from 'excalibur';
 
 export class Sensor {
   car: Actor;
@@ -15,9 +15,8 @@ export class Sensor {
     this.speedCorrection = speedCorrection;
   }
 
-  detectCollision(maze: any): boolean {
-    // Collision detection logic
-    // ...to be implemented...
+  detectCollision(): boolean {
+    // Placeholder: always return false (to be replaced with real maze collision logic)
     return false;
   }
 }

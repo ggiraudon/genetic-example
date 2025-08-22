@@ -9,7 +9,7 @@ export class Maze extends Actor {
   }
 
   private createMaze() {
-    // Create a simple static maze layout
-    // ...to be implemented...
+    // Example: create a border and a few walls
+    // ...add wall actors to this.walls...
   }
 }

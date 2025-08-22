@@ -7,6 +7,7 @@ export class Car extends Actor {
   fitness: number = 0;
   speed: number;
   heading: number;
+  alive: boolean = true;
 
   constructor(x: number, y: number, heading: number, speed: number, genome: number[]) {
     super({ x, y, width: 15, height: 20, color: Color.Red });
@@ -24,8 +25,22 @@ export class Car extends Actor {
     }
   }
 
-  onPreUpdate() {
-    // Update car position and sensors
-    // ...to be implemented...
+  onPreUpdate(_engine, _delta) {
+    if (!this.alive) return;
+    // Move car forward
+    const rad = this.heading * Math.PI / 180;
+    this.pos.x += Math.cos(rad) * this.speed;
+    this.pos.y += Math.sin(rad) * this.speed;
+    // Update sensors and check for collisions
+    for (const sensor of this.sensors) {
+      if (sensor.detectCollision()) {
+        this.heading += sensor.headingCorrection;
+        this.speed += sensor.speedCorrection;
+      }
+    }
+    // Clamp speed
+    this.speed = Math.max(0, Math.min(this.speed, 10));
+    // Fitness: distance travelled
+    this.fitness += this.speed;
   }
 }
