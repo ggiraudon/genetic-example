@@ -1,18 +1,17 @@
 {
   "name": "genetic-car-maze",
   "version": "1.0.0",
-  "description": "Genetic Algorithm Car Maze Game using Excalibur.js and TypeScript",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "excalibur": "^0.27.0"
+    "excalibur": "^0.28.0"
   },
   "devDependencies": {
-    "parcel": "^2.0.0",
     "typescript": "^5.0.0",
-    "vite": "^6.3.5"
+    "vite": "^5.0.0"
   }
 }
