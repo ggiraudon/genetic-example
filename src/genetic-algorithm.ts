@@ -1,12 +1,26 @@
 import { Car, CarGenome } from './car';
 import { CONFIG } from './config';
 
+export interface TopCarInfo {
+  rank: number;
+  fitness: number;
+  tilesVisited: number;
+  sensorGenes: Array<{
+    angle: number;
+    distance: number;
+    headingCorrection: number;
+    speedCorrection: number;
+  }>;
+}
+
 export interface PopulationStats {
   generation: number;
   averageFitness: number;
   bestFitness: number;
   worstFitness: number;
   carsAlive: number;
+  bestTilesVisited: number;
+  topCars: TopCarInfo[];
 }
 
 export class GeneticAlgorithm {
@@ -67,6 +81,12 @@ export class GeneticAlgorithm {
     return this.population;
   }
 
+  public shouldRandomizeMaze(): boolean {
+    return CONFIG.RANDOMIZE_MAZE_AFTER_GENERATIONS > 0 && 
+           this.generation > 1 && 
+           (this.generation - 1) % CONFIG.RANDOMIZE_MAZE_AFTER_GENERATIONS === 0;
+  }
+
   private tournamentSelection(): Car {
     const tournamentSize = 5;
     let best = this.population[Math.floor(Math.random() * this.population.length)];
@@ -108,7 +128,25 @@ export class GeneticAlgorithm {
 
   public getPopulationStats(): PopulationStats {
     const fitnesses = this.population.map(car => car.fitness);
+    const tilesVisited = this.population.map(car => car.tilesVisited);
     const carsAlive = this.population.filter(car => car.isAlive).length;
+    
+    // Get top 5 performing cars
+    const sortedCars = [...this.population]
+      .sort((a, b) => b.fitness - a.fitness)
+      .slice(0, 5);
+    
+    const topCars: TopCarInfo[] = sortedCars.map((car, index) => ({
+      rank: index + 1,
+      fitness: car.fitness,
+      tilesVisited: car.tilesVisited,
+      sensorGenes: car.genome.sensorGenes.map((gene, sensorIndex) => ({
+        angle: CONFIG.SENSOR_ANGLES[sensorIndex],
+        distance: gene.distance,
+        headingCorrection: gene.headingCorrection,
+        speedCorrection: gene.speedCorrection,
+      }))
+    }));
     
     return {
       generation: this.generation,
@@ -116,6 +154,8 @@ export class GeneticAlgorithm {
       bestFitness: Math.max(...fitnesses),
       worstFitness: Math.min(...fitnesses),
       carsAlive: carsAlive,
+      bestTilesVisited: Math.max(...tilesVisited),
+      topCars: topCars,
     };
   }
 

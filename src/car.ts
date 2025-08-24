@@ -13,10 +13,18 @@ export class Car extends Actor {
   public fitness: number = 0;
   public isAlive: boolean = true;
   public distanceTraveled: number = 0;
-  private lastPosition: Vector;
+  public tilesVisited: number = 0;
   private speed: number = 2;
   private heading: number = 0; // degrees
   private maze: Maze;
+  private visitedTiles: Set<string> = new Set(); // All tiles visited (for total count)
+  private recentTiles: string[] = []; // Last N tiles visited (for recent memory check)
+
+  private getTileKey(position: Vector): string {
+    const col = Math.floor(position.x / CONFIG.MAZE_TILE_SIZE);
+    const row = Math.floor(position.y / CONFIG.MAZE_TILE_SIZE);
+    return `${col},${row}`;
+  }
 
   constructor(position: Vector, genome: CarGenome, maze: Maze) {
     super({
@@ -24,17 +32,25 @@ export class Car extends Actor {
       width: CONFIG.CAR_WIDTH,
       height: CONFIG.CAR_HEIGHT,
       color: Color.Blue,
-      collisionType: CollisionType.Active,
+      collisionType: CONFIG.ENABLE_CAR_COLLISIONS ? CollisionType.Active : CollisionType.PreventCollision,
     });
 
     this.genome = genome;
     this.maze = maze;
-    this.lastPosition = position.clone();
     this.createSensors();
+
+    // Initialize with starting tile
+    const startTileKey = this.getTileKey(position);
+    this.visitedTiles.add(startTileKey);
+    this.recentTiles.push(startTileKey);
+    this.tilesVisited = 1;
 
     // Set up collision detection
     this.on('collisionstart', (evt) => {
       if (evt.other.constructor.name === 'MazeWall') {
+        this.kill();
+      } else if (CONFIG.ENABLE_CAR_COLLISIONS && evt.other.constructor.name === 'Car') {
+        // Car-to-car collision: kill this car if collisions are enabled
         this.kill();
       }
     });
@@ -94,6 +110,9 @@ export class Car extends Actor {
     if (activeSensors > 0) {
       this.heading += totalHeadingCorrection / activeSensors;
       this.speed *= totalSpeedCorrection;
+    } else {
+      // If no sensors are colliding, apply linear acceleration
+      this.speed += CONFIG.LINEAR_ACCELERATION;
     }
 
     // Keep speed within configured bounds
@@ -116,17 +135,39 @@ export class Car extends Actor {
   }
 
   private updateFitness(): void {
-    const distanceThisFrame = this.pos.distance(this.lastPosition);
-    this.distanceTraveled += distanceThisFrame;
+    const currentTileKey = this.getTileKey(this.pos);
     
-    // Fitness is based on distance traveled
-    this.fitness = this.distanceTraveled;
+    // Check if this tile should count towards fitness
+    let shouldCountTile = false;
+    
+    // Always count if it's the first tile or if we haven't visited this tile before
+    if (this.recentTiles.length === 0 || !this.visitedTiles.has(currentTileKey)) {
+      shouldCountTile = true;
+    } else {
+      // Check if this tile was NOT in the recent memory
+      shouldCountTile = !this.recentTiles.includes(currentTileKey);
+    }
+    
+    if (shouldCountTile) {
+      // Add to visited tiles if not already visited
+      if (!this.visitedTiles.has(currentTileKey)) {
+        this.visitedTiles.add(currentTileKey);
+        this.tilesVisited++;
+      }
+      
+      // Add to recent tiles and maintain the memory limit
+      this.recentTiles.push(currentTileKey);
+      if (this.recentTiles.length > CONFIG.RECENT_TILES_MEMORY) {
+        this.recentTiles.shift(); // Remove the oldest tile
+      }
+    }
+    
+    // Fitness is based on number of unique tiles visited
+    this.fitness = this.tilesVisited;
     
     // Bonus for getting closer to finish
     const distanceToFinish = this.maze.getDistanceToFinish(this.pos);
     this.fitness += Math.max(0, 1000 - distanceToFinish);
-    
-    this.lastPosition = this.pos.clone();
   }
 
   public kill(): void {

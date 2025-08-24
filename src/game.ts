@@ -18,8 +18,8 @@ export class Game {
   constructor() {
     this.engine = new Engine({
       canvasElementId: 'canvas',
-      width: 800,
-      height: 600,
+      width: CONFIG.MAZE_WIDTH * CONFIG.MAZE_TILE_SIZE,
+      height: CONFIG.MAZE_HEIGHT * CONFIG.MAZE_TILE_SIZE,
       displayMode: DisplayMode.Fixed,
       backgroundColor: Color.Black,
     });
@@ -62,6 +62,26 @@ export class Game {
     // Remove old cars from scene
     for (const car of this.cars) {
       this.scene.remove(car);
+    }
+
+    // Check if maze should be randomized
+    if (this.geneticAlgorithm.shouldRandomizeMaze()) {
+      // Remove old walls
+      const oldWalls = this.maze.getWalls();
+      for (const wall of oldWalls) {
+        this.scene.remove(wall);
+      }
+      
+      // Generate new maze
+      this.maze.randomizeMaze();
+      
+      // Add new walls to scene
+      const newWalls = this.maze.getWalls();
+      for (const wall of newWalls) {
+        this.scene.add(wall);
+      }
+      
+      this.uiManager.showMessage(`Maze randomized for generation ${this.geneticAlgorithm.getCurrentGeneration() + 1}!`);
     }
 
     // Create new population
@@ -118,7 +138,7 @@ export class Game {
     this.geneticAlgorithm.saveGeneration(stats);
     
     this.uiManager.showMessage(
-      `Generation ${stats.generation} ended! Best fitness: ${Math.round(stats.bestFitness)}`
+      `Generation ${stats.generation} ended! Best fitness: ${Math.round(stats.bestFitness)} | Best tiles: ${stats.bestTilesVisited}`
     );
 
     this.running = false;

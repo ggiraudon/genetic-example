@@ -23,6 +23,22 @@
         flex-direction: column;
         align-items: center;
         gap: 20px;
+        max-width: 1600px;
+        margin: 0 auto;
+      }
+      
+      #main-content {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        width: 100%;
+      }
+      
+      #left-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
       }
       
       #canvas {
@@ -38,6 +54,16 @@
         text-align: center;
       }
       
+      #top-cars-panel {
+        background-color: #333;
+        padding: 15px;
+        border-radius: 8px;
+        width: 400px;
+        max-height: 600px;
+        overflow-y: auto;
+        flex-shrink: 0;
+      }
+      
       .stat-item {
         margin: 5px 0;
         font-size: 16px;
@@ -47,28 +73,103 @@
         font-weight: bold;
         color: #4CAF50;
       }
+      
+      .car-section {
+        margin: 15px 0;
+        padding: 10px;
+        background-color: #444;
+        border-radius: 5px;
+        border-left: 4px solid #FFD700;
+      }
+      
+      .car-title {
+        font-weight: bold;
+        color: #FFD700;
+        margin-bottom: 10px;
+        font-size: 14px;
+        text-align: center;
+      }
+      
+      .sensors-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      
+      .sensor-info {
+        background-color: #555;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        border: 1px solid #666;
+      }
+      
+      .sensor-label {
+        color: #87CEEB;
+        font-weight: bold;
+      }
+      
+      .sensor-value {
+        color: #FFF;
+        margin-left: 5px;
+        float: right;
+      }
+      
+      /* Responsive design */
+      @media (max-width: 1400px) {
+        #main-content {
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        #top-cars-panel {
+          width: 100%;
+          max-width: 800px;
+        }
+        
+        .sensors-grid {
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+      }
     </style>
   </head>
   <body>
     <div id="game-container">
       <h1>Genetic Algorithm Car Maze</h1>
-      <canvas id="canvas"></canvas>
-      <div id="stats-panel">
-        <div class="stat-item">
-          <span class="stat-label">Generation:</span>
-          <span id="generation">0</span>
+      
+      <div id="main-content">
+        <div id="left-panel">
+          <canvas id="canvas"></canvas>
+          <div id="stats-panel">
+            <div class="stat-item">
+              <span class="stat-label">Generation:</span>
+              <span id="generation">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Cars Alive:</span>
+              <span id="cars-alive">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Total Cars:</span>
+              <span id="total-cars">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Best Fitness:</span>
+              <span id="best-fitness">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Best Tiles Visited:</span>
+              <span id="best-tiles">0</span>
+            </div>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">Cars Alive:</span>
-          <span id="cars-alive">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Total Cars:</span>
-          <span id="total-cars">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Best Fitness:</span>
-          <span id="best-fitness">0</span>
+        
+        <div id="top-cars-panel">
+          <h3 style="text-align: center; color: #FFD700; margin-top: 0;">Top 5 Performing Cars</h3>
+          <div id="top-cars-list">
+            <!-- Top cars will be populated here -->
+          </div>
         </div>
       </div>
     </div>
